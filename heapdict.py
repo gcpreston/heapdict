@@ -125,6 +125,14 @@ class HeapDict(collections.MutableMapping):
     def __len__(self):
         return len(self.d)
 
+    @doc(dict.__str__)
+    def __str__(self):
+        return str(self.d)
+
+    @doc(dict.__repr__)
+    def __repr__(self):
+        return repr(self.d)
+
 
 del doc
 __all__ = ['HeapDict']
