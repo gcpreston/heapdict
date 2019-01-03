@@ -39,7 +39,7 @@ class HeapDict(collections.MutableMapping):
         self.d.clear()
 
     @doc(dict.__setitem__)
-    def __setitem__(self, key: Any, value: int):
+    def __setitem__(self, key: Any, value: float):
         if key in self.d:
             self.pop(key)
         wrapper = [value, key, len(self)]
