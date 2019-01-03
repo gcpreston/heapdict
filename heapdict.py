@@ -1,27 +1,32 @@
 import collections
 
+from typing import Tuple, Hashable, Any
+
+
 def doc(s):
     if hasattr(s, '__call__'):
         s = s.__doc__
+
     def f(g):
         g.__doc__ = s
         return g
     return f
 
-class heapdict(collections.MutableMapping):
+
+class HeapDict(collections.MutableMapping):
     __marker = object()
 
     @staticmethod
     def _parent(i):
-        return ((i - 1) >> 1)
+        return (i - 1) >> 1
 
     @staticmethod
     def _left(i):
-        return ((i << 1) + 1)
+        return (i << 1) + 1
 
     @staticmethod
     def _right(i):
-        return ((i+1) << 1)    
+        return (i + 1) << 1
     
     def __init__(self, *args, **kw):
         self.heap = []
@@ -34,7 +39,7 @@ class heapdict(collections.MutableMapping):
         self.d.clear()
 
     @doc(dict.__setitem__)
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: Any, value: int):
         if key in self.d:
             self.pop(key)
         wrapper = [value, key, len(self)]
@@ -43,15 +48,15 @@ class heapdict(collections.MutableMapping):
         self._decrease_key(len(self.heap)-1)
 
     def _min_heapify(self, i):
-        l = self._left(i)
-        r = self._right(i)
+        left = self._left(i)
+        right = self._right(i)
         n = len(self.heap)
-        if l < n and self.heap[l][0] < self.heap[i][0]:
-            low = l
+        if left < n and self.heap[left][0] < self.heap[i][0]:
+            low = left
         else:
             low = i
-        if r < n and self.heap[r][0] < self.heap[low][0]:
-            low = r
+        if right < n and self.heap[right][0] < self.heap[low][0]:
+            low = right
 
         if low != i:
             self._swap(i, low)
@@ -86,8 +91,16 @@ class heapdict(collections.MutableMapping):
     def __iter__(self):
         return iter(self.d)
 
-    def popitem(self):
-        """D.popitem() -> (k, v), remove and return the (key, value) pair with lowest\nvalue; but raise KeyError if D is empty."""
+    def popitem(self) -> Tuple[Hashable, float]:
+        """
+        D.popitem() -> (k, v), remove and return the (key, value) pair with
+        lowest value; but raise KeyError if D is empty.
+
+        Remove and return the (key, value) pair with lowest value
+        """
+        if len(self.heap) == 0:
+            raise KeyError('priority queue is empty')
+
         wrapper = self.heap[0]
         if len(self.heap) == 1:
             self.heap.pop()
@@ -96,15 +109,22 @@ class heapdict(collections.MutableMapping):
             self.heap[0][2] = 0
             self._min_heapify(0)
         del self.d[wrapper[1]]
-        return wrapper[1], wrapper[0]    
+        return wrapper[1], wrapper[0]
+
+    def peekitem(self) -> Tuple[Hashable, float]:
+        """
+        D.peekitem() -> (k, v), return the (key, value) pair with lowest value;
+        but raise KeyError if D is empty.
+        """
+        if len(self.heap) == 0:
+            raise KeyError('priority queue is empty')
+
+        return self.heap[0][1], self.heap[0][0]
 
     @doc(dict.__len__)
     def __len__(self):
         return len(self.d)
 
-    def peekitem(self):
-        """D.peekitem() -> (k, v), return the (key, value) pair with lowest value;\n but raise KeyError if D is empty."""
-        return (self.heap[0][1], self.heap[0][0])
 
 del doc
-__all__ = ['heapdict']
+__all__ = ['HeapDict']
