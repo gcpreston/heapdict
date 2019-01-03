@@ -127,11 +127,13 @@ class HeapDict(collections.MutableMapping):
 
     @doc(dict.__str__)
     def __str__(self):
-        return str(self.d)
+        s = {k: self.d[k][0] for k in self.d}
+        return str(s)
 
     @doc(dict.__repr__)
     def __repr__(self):
-        return repr(self.d)
+        r = {k: self.d[k][0] for k in self.d}
+        return repr(r)
 
 
 del doc
